@@ -88,6 +88,19 @@ class TaskWorkflowTests(unittest.TestCase):
         self.assertIsNotNone(task)
         self.assertTrue(task.done)
 
+    def test_mark_task_done_is_idempotent(self):
+        task_id = self.create_task()
+
+        self.client.post(f"/todo/done/{task_id}", follow_redirects=True)
+        response = self.client.post(
+            f"/todo/done/{task_id}",
+            follow_redirects=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'bg-success rounded-pill fs-6">Done</span>', response.data)
+        self.assertTrue(db.session.get(ToDo, task_id).done)
+
     def test_completing_one_task_keeps_other_task_pending(self):
         completed_id = self.create_task("Task to complete")
         pending_id = self.create_task("Task to keep pending")
@@ -116,6 +129,21 @@ class TaskWorkflowTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIsNone(db.session.get(ToDo, task_id))
+
+    def test_delete_task_keeps_other_tasks(self):
+        deleted_id = self.create_task("Task to delete")
+        retained_id = self.create_task("Task to retain")
+
+        response = self.client.post(
+            f"/todo/delete/{deleted_id}",
+            follow_redirects=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(db.session.get(ToDo, deleted_id))
+        self.assertIsNotNone(db.session.get(ToDo, retained_id))
+        self.assertIn(b"Task to retain", response.data)
+        self.assertNotIn(b"Task to delete", response.data)
 
 
 if __name__ == "__main__":
