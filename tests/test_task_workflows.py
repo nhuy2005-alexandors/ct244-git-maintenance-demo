@@ -166,6 +166,25 @@ class TaskWorkflowTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertNotIn(b"Task should disappear", response.data)
 
+    def test_task_list_is_scoped_to_authenticated_user(self):
+        self.create_task("Private task for demo-user")
+
+        other_user = User(username="other-user", password="other-password")
+        db.session.add(other_user)
+        db.session.commit()
+
+        self.client.get("/auth/logout", follow_redirects=True)
+        login_response = self.client.post(
+            "/auth/login",
+            data={"username": "other-user", "password": "other-password"},
+            follow_redirects=True,
+        )
+        self.assertEqual(login_response.status_code, 200)
+
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn(b"Private task for demo-user", response.data)
+
 
 if __name__ == "__main__":
     unittest.main()
