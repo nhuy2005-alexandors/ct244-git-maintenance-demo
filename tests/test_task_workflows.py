@@ -1,4 +1,8 @@
+import os
 import unittest
+
+# Keep test data separate from the database used by the interactive UI.
+os.environ["DATABASE_URL"] = "sqlite:///test-database.db"
 
 from main import app
 from app.models import ToDo, User, db
@@ -8,7 +12,6 @@ class TaskWorkflowTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Use the real Flask application and its root route.
-        # The SQLite database lives under instance/ and is git-ignored.
         app.config.update(
             TESTING=True,
             WTF_CSRF_ENABLED=False,
