@@ -1,20 +1,20 @@
 import unittest
 
-from app import create_app
+from main import app
 from app.models import ToDo, User, db
 
 
 class TaskWorkflowTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.app = create_app()
-        cls.app.config.update(
+        # Use the real Flask application and its root route.
+        # The SQLite database lives under instance/ and is git-ignored.
+        app.config.update(
             TESTING=True,
             WTF_CSRF_ENABLED=False,
             SECRET_KEY="test-only-secret",
-            SQLALCHEMY_DATABASE_URI="sqlite:///:memory:",
         )
-        db.init_app(cls.app)
+        cls.app = app
 
     def setUp(self):
         self.app_context = self.app.app_context()
