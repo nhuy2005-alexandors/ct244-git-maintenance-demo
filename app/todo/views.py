@@ -57,7 +57,7 @@ def delete_todo(todo_id):
 
     delete_todo = get_todo(id_user=user_id, id=todo_id)
 
-    db.session.delete(delete_todo)
+    db.session.add(delete_todo)
     db.session.commit()
 
     flash('To Do deleted successfully!', 'success')
