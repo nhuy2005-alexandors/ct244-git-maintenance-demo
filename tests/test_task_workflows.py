@@ -101,6 +101,16 @@ class TaskWorkflowTests(unittest.TestCase):
         self.assertIn(b'bg-success rounded-pill fs-6">Done</span>', response.data)
         self.assertTrue(db.session.get(ToDo, task_id).done)
 
+    def test_completed_status_persists_after_page_reload(self):
+        task_id = self.create_task()
+
+        self.client.post(f"/todo/done/{task_id}", follow_redirects=True)
+        response = self.client.get("/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'bg-success rounded-pill fs-6">Done</span>', response.data)
+        self.assertNotIn(b'bg-primary rounded-pill fs-6">Pending</span>', response.data)
+
     def test_completing_one_task_keeps_other_task_pending(self):
         completed_id = self.create_task("Task to complete")
         pending_id = self.create_task("Task to keep pending")
