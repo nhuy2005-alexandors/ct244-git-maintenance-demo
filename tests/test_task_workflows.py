@@ -61,6 +61,15 @@ class TaskWorkflowTests(unittest.TestCase):
         self.assertIsNotNone(task)
         self.assertFalse(task.done)
 
+    def test_new_task_is_rendered_as_pending(self):
+        self.create_task()
+
+        response = self.client.get("/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'bg-primary rounded-pill fs-6">Pending</span>', response.data)
+        self.assertNotIn(b'bg-success rounded-pill fs-6">Done</span>', response.data)
+
     def test_mark_task_done(self):
         task_id = self.create_task()
 
