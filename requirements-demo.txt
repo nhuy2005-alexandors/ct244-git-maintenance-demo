@@ -1,0 +1,11 @@
+# Demo runtime for Python 3.11
+# Kept separate so the upstream requirements.txt remains unchanged.
+Flask==2.3.3
+Flask-Login==0.6.3
+Flask-SQLAlchemy==3.1.1
+Flask-WTF==1.2.1
+Bootstrap-Flask==2.3.3
+SQLAlchemy==2.0.36
+Werkzeug==2.3.8
+WTForms==3.1.2
+greenlet==3.1.1
