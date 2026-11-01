@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask
 from flask_bootstrap import Bootstrap5
 from flask_login import LoginManager
@@ -7,7 +9,7 @@ from .todo import views as todo_views
 from .models import UserModel
 
 
-# To handle user authentication
+# To handle user login authentication
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
 
@@ -34,7 +36,9 @@ def create_app() -> Flask:
     login_manager.init_app(app)
 
     app.config["SECRET_KEY"] = "SUPER_SECRET_KEY"
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
+        "DATABASE_URL", "sqlite:///database.db"
+    )
 
     # Blueprints
     app.register_blueprint(auth_views.auth)
