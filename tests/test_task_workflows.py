@@ -85,6 +85,24 @@ class TaskWorkflowTests(unittest.TestCase):
         self.assertIsNotNone(task)
         self.assertTrue(task.done)
 
+    def test_completing_one_task_keeps_other_task_pending(self):
+        completed_id = self.create_task("Task to complete")
+        pending_id = self.create_task("Task to keep pending")
+
+        response = self.client.post(
+            f"/todo/done/{completed_id}",
+            follow_redirects=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Task to complete", response.data)
+        self.assertIn(b"Task to keep pending", response.data)
+
+        completed_task = db.session.get(ToDo, completed_id)
+        pending_task = db.session.get(ToDo, pending_id)
+        self.assertTrue(completed_task.done)
+        self.assertFalse(pending_task.done)
+
     def test_delete_task(self):
         task_id = self.create_task()
 
