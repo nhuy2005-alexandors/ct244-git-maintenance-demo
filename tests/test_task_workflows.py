@@ -155,6 +155,17 @@ class TaskWorkflowTests(unittest.TestCase):
         self.assertIn(b"Task to retain", response.data)
         self.assertNotIn(b"Task to delete", response.data)
 
+    def test_deleted_task_is_absent_from_rendered_list(self):
+        task_id = self.create_task("Task should disappear")
+
+        response = self.client.post(
+            f"/todo/delete/{task_id}",
+            follow_redirects=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn(b"Task should disappear", response.data)
+
 
 if __name__ == "__main__":
     unittest.main()
