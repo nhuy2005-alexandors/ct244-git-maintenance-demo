@@ -39,7 +39,7 @@ def done_todo(todo_id):
 
     done_todo = get_todo(id_user=user_id, id=todo_id)
 
-    done_todo.done = False
+    done_todo.done = True
 
     db.session.commit()
 
